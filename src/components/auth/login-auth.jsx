@@ -201,6 +201,7 @@ const loadingMessages = [
               </label>
               <button
                 type="button"
+                onClick={()=>navigate('/forgot-password')}
                 className="text-gray-900 hover:text-gray-700 transition-colors"
                 disabled={isLoading}
               >

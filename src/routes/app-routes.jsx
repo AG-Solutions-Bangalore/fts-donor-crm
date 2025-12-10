@@ -5,6 +5,10 @@ import { Route, Routes } from "react-router-dom";
 import Maintenance from "@/components/common/maintenance";
 import SignUp from "@/app/auth/sign-up";
 import ReceiptList from "@/app/receipt/receipt-list";
+import ReceiptView from "@/app/receipt/receipt-view";
+import SchoolList from "@/app/school/school-list";
+import SchoolView from "@/app/school/school-view";
+import Profile from "@/app/profile/profile";
 
 
 const Login = lazy(() => import("@/app/auth/login"));
@@ -16,6 +20,7 @@ const Dashboard = lazy(() => import("@/app/dashboard/dashboard"));
 const ForgotPassword = lazy(() =>
   import("@/components/forgot-password/forgot-password")
 );
+
 const AuthRoute = lazy(() => import("./auth-route"));
 const ProtectedRoute = lazy(() => import("./protected-route"));
 
@@ -52,6 +57,38 @@ function AppRoutes() {
           element={
             <Suspense fallback={<LoadingBar />}>
               <ReceiptList />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/receipt-view"
+          element={
+            <Suspense fallback={<LoadingBar />}>
+              <ReceiptView />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/school"
+          element={
+            <Suspense fallback={<LoadingBar />}>
+              <SchoolList />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/school-view/:id"
+          element={
+            <Suspense fallback={<LoadingBar />}>
+              <SchoolView />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <Suspense fallback={<LoadingBar />}>
+              <Profile />
             </Suspense>
           }
         />

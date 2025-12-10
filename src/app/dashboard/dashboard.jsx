@@ -129,7 +129,7 @@ const DonorDashboard = () => {
                   />
                 
                   <div className="absolute bottom-4 right-4 bg-gray-800/70 backdrop-blur-sm px-4 py-1 rounded-full text-white text-sm">
-                    ID: {individualCompany.indicomp_fts_id}
+                    FTS ID: {individualCompany.indicomp_fts_id}
                   </div>
                 </div>
 

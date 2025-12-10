@@ -9,7 +9,7 @@ const Navbar = () => {
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-  const location = useLocation(); // 👉 GET CURRENT ROUTE
+  const location = useLocation();
 
   const navItems = [
     { name: 'Dashboard', path: '/home' },
@@ -27,7 +27,7 @@ const Navbar = () => {
     setIsLogoutOpen(true);
   };
 
-  // Close dropdown on outside click
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -51,16 +51,16 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* NAV ITEMS */}
+         
           <div className="hidden md:flex items-center gap-2">
             {navItems.map((item) => {
-              const isActive = location.pathname === item.path; // 👉 ACTIVE CHECK
+              const isActive = location.pathname === item.path; 
 
               return (
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-[0.4rem] text-sm font-medium transition-all ${
                     isActive
                       ? 'bg-gray-900 text-white'
                       : 'text-gray-700 hover:bg-white/50'
@@ -72,13 +72,14 @@ const Navbar = () => {
             })}
           </div>
 
-          {/* RIGHT SIDE ICONS */}
+        
           <div className="flex items-center gap-4">
-            {/* Settings icon */}
+      <Link
+                    to="/profile">
             <button className="p-2 hover:bg-white/50 rounded-lg transition-colors">
               <Settings className="w-5 h-5 text-gray-700" />
             </button>
-
+            </Link>
             {/* User Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
