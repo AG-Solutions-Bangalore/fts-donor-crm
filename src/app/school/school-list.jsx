@@ -4,13 +4,13 @@ import Cookies from 'js-cookie';
 import { 
   Search, Filter, ChevronDown, ChevronUp, Download, Eye, 
   Edit, Trash2, ChevronLeft, ChevronRight, Columns, 
-  RefreshCw, Receipt as ReceiptIcon, Calendar, CreditCard, 
-  Building, User, FileText, CheckCircle, XCircle, ArrowUpDown,
-  X
+  RefreshCw, School as SchoolIcon, Calendar, Building, 
+  User, FileText, CheckCircle, XCircle, ArrowUpDown,
+  X, Hash, CalendarDays, Users, BookOpen, MapPin
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const ReceiptList = () => {
+const SchoolList = () => {
   const token = Cookies.get("token");
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -20,17 +20,18 @@ const ReceiptList = () => {
   const [hiddenColumns, setHiddenColumns] = useState({});
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const dropdownRef = useRef(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
   // Available columns with their display names
   const columns = [
-    { key: 'receipt_no', label: 'Receipt No', visible: true,  },
-
-    { key: 'receipt_date', label: 'Date', visible: true,  },
-    { key: 'receipt_total_amount', label: 'Amount', visible: true, },
-    { key: 'receipt_donation_type', label: 'Donation Type', visible: true,  },
-    { key: 'receipt_exemption_type', label: 'Exemption', visible: true,  },
-   
-   
+    { key: 'indicomp_full_name', label: 'Company Name', visible: true },
+    { key: 'schoolalot_school_id', label: 'School ID', visible: true ,width: 'w-4'},
+    { key: 'schoolalot_financial_year', label: 'Financial Year', visible: true },
+    { key: 'schoolalot_year', label: 'Allotment Year', visible: true },
+    { key: 'receipt_no_of_ots', label: 'No. of OTS', visible: true },
+    { key: 'no_of_schools_allotted', label: 'Schools Allotted', visible: true },
+    { key: 'schoolalot_from_date', label: 'From Date', visible: true },
+    { key: 'schoolalot_to_date', label: 'To Date', visible: true },
   ];
 
   // Close dropdown when clicking outside
@@ -57,9 +58,9 @@ const ReceiptList = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Fetch receipts data
+  // Fetch schools data
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['receipts', currentPage, perPage, debouncedSearch],
+    queryKey: ['schools', currentPage, perPage, debouncedSearch],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: currentPage.toString(),
@@ -68,7 +69,7 @@ const ReceiptList = () => {
       });
 
       const response = await fetch(
-        `https://agstest.in/api2/public/api/fetch-donor-receipts-list?${params}`,
+        `https://agstest.in/api2/public/api/fetch-school-alloted-list?${params}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -76,7 +77,7 @@ const ReceiptList = () => {
         }
       );
       
-      if (!response.ok) throw new Error('Failed to fetch receipts');
+      if (!response.ok) throw new Error('Failed to fetch schools');
       return response.json();
     }
   });
@@ -108,25 +109,11 @@ const ReceiptList = () => {
     });
   };
 
-  // Format currency
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount || 0);
-  };
-
   // Handle page change
   const handlePageChange = (page) => {
     if (page >= 1 && page <= data?.data?.last_page) {
       setCurrentPage(page);
     }
-  };
-  const handleViewReceipt = (receiptRefNo) => {
-
-    navigate(`/receipt-view?ref=${encodeURIComponent(receiptRefNo)}`);
   };
 
   // Get visible columns
@@ -148,7 +135,7 @@ const ReceiptList = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-200 via-gray-100 to-amber-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-200 via-gray-100 to-blue-50 flex items-center justify-center">
         <div className="bg-white rounded-3xl p-8 shadow-lg max-w-md">
           <div className="text-red-500 text-5xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Data</h2>
@@ -165,20 +152,20 @@ const ReceiptList = () => {
     );
   }
 
-  const receipts = data?.data?.data || [];
+  const schools = data?.data?.data || [];
   const pagination = data?.data || {};
 
   return (
     <div>
       <div className="px-4 md:px-8 pb-8 mx-auto">
-        <div className="bg-gradient-to-br from-gray-100 to-amber-50 rounded-[2rem] md:rounded-[3rem] p-4 md:p-8 shadow-lg">
+        <div className="bg-gradient-to-br from-gray-100 to-blue-50 rounded-[2rem] md:rounded-[3rem] p-4 md:p-8 shadow-lg">
           {/* Header */}
           <div className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Receipts Management</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Schools Allotment Management</h1>
                 <p className="text-gray-600">
-                  Total {pagination.total || 0} receipts • Page {pagination.current_page || 1} of {pagination.last_page || 1}
+                  Total {pagination.total || 0} allotments • Page {pagination.current_page || 1} of {pagination.last_page || 1}
                 </p>
               </div>
               
@@ -188,7 +175,7 @@ const ReceiptList = () => {
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
-                      placeholder="Search receipts by number, donor name, or reference..."
+                      placeholder="Search by company name, school ID, or financial year..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
@@ -267,7 +254,7 @@ const ReceiptList = () => {
                     {visibleColumns.map((column) => (
                       <th
                         key={column.key}
-                        className={`px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors ${column.width}`}
+                        className={`px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors `}
                         onClick={() => handleSort(column.key)}
                       >
                         <div className="flex items-center gap-2">
@@ -296,49 +283,44 @@ const ReceiptList = () => {
                     Array.from({ length: perPage }).map((_, index) => (
                       <ShimmerRow key={index} />
                     ))
-                  ) : receipts.length > 0 ? (
-                    receipts.map((receipt) => (
-                      <tr key={receipt.id} className="hover:bg-gray-50 transition-colors">
+                  ) : schools.length > 0 ? (
+                    schools.map((school) => (
+                      <tr key={school.id} className="hover:bg-gray-50 transition-colors">
                         {visibleColumns.map((column) => (
                           <td key={column.key} className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
-                              {column.key === 'receipt_date' ? (
+                              {column.key === 'schoolalot_from_date' || column.key === 'schoolalot_to_date' ? (
                                 <div className="flex items-center gap-2">
-                                  <Calendar className="w-4 h-4 text-gray-400" />
-                                  {formatDate(receipt[column.key])}
+                                  <CalendarDays className="w-4 h-4 text-gray-400" />
+                                  {formatDate(school[column.key])}
                                 </div>
-                              ) : column.key === 'receipt_total_amount' ? (
-                                <div className="font-semibold">
-                                  {formatCurrency(parseFloat(receipt[column.key]))}
-                                </div>
-                              ) : column.key === 'tally_status' ? (
+                              ) : column.key === 'indicomp_full_name' ? (
                                 <div className="flex items-center gap-2">
-                                  {receipt[column.key] === 'True' ? (
-                                    <>
-                                      <CheckCircle className="w-4 h-4 text-green-500" />
-                                      <span className="text-green-700">Synced</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <XCircle className="w-4 h-4 text-amber-500" />
-                                      <span className="text-amber-700">Pending</span>
-                                    </>
-                                  )}
+                                  <Building className="w-4 h-4 text-gray-400" />
+                                  <span className="font-medium">{school[column.key]}</span>
                                 </div>
-                              ) : column.key === 'receipt_donation_type' ? (
+                              ) : column.key === 'schoolalot_school_id' ? (
+                                <div className="flex items-center gap-2 break-words whitespace-normal">
+                            
+                                <span className="font-mono break-all">{school[column.key]}</span>
+                              </div>
+                              ) : column.key === 'receipt_no_of_ots' ? (
                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                  {receipt[column.key]}
+                                  <FileText className="w-3 h-3 mr-1" />
+                                  {school[column.key]} OTS
                                 </span>
-                              ) : column.key === 'receipt_exemption_type' ? (
-                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                  receipt[column.key] === '80G' 
-                                    ? 'bg-green-100 text-green-800' 
-                                    : 'bg-gray-100 text-gray-800'
-                                }`}>
-                                  {receipt[column.key]}
+                              ) : column.key === 'no_of_schools_allotted' ? (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  <SchoolIcon className="w-3 h-3 mr-1" />
+                                  {school[column.key]} Schools
+                                </span>
+                              ) : column.key === 'schoolalot_financial_year' || column.key === 'schoolalot_year' ? (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                  <Calendar className="w-3 h-3 mr-1" />
+                                  {school[column.key]}
                                 </span>
                               ) : (
-                                receipt[column.key] || 'N/A'
+                                school[column.key] || 'N/A'
                               )}
                             </div>
                           </td>
@@ -346,13 +328,12 @@ const ReceiptList = () => {
                         
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                      
-                            
-                       
-                            <button      onClick={() => handleViewReceipt(receipt.receipt_ref_no)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View">
+                            <Link to={`/school-view/${school.id}`}>
+                            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View">
                               <Eye className="w-4 h-4 text-gray-600" />
                             </button>
-                          
+                         
+                            </Link>
                           </div>
                         </td>
                       </tr>
@@ -361,12 +342,12 @@ const ReceiptList = () => {
                     <tr>
                       <td colSpan={visibleColumns.length + 1} className="px-6 py-12 text-center">
                         <div className="text-gray-500">
-                          <ReceiptIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                          <p className="text-lg font-medium mb-2">No receipts found</p>
+                          <SchoolIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                          <p className="text-lg font-medium mb-2">No schools allotment found</p>
                           <p className="text-sm">
                             {debouncedSearch 
-                              ? `No receipts match "${debouncedSearch}"` 
-                              : 'Start by creating your first receipt'}
+                              ? `No schools match "${debouncedSearch}"` 
+                              : 'Start by creating your first school allotment'}
                           </p>
                         </div>
                       </td>
@@ -383,10 +364,8 @@ const ReceiptList = () => {
                   <div className="text-sm text-gray-700">
                     Showing <span className="font-medium">{pagination.from || 0}</span> to{' '}
                     <span className="font-medium">{pagination.to || 0}</span> of{' '}
-                    <span className="font-medium">{pagination.total || 0}</span> receipts
+                    <span className="font-medium">{pagination.total || 0}</span> allotments
                   </div>
-
-                 
                   
                   <div className="flex items-center gap-2">
                     <button
@@ -466,4 +445,4 @@ const ReceiptList = () => {
   );
 };
 
-export default ReceiptList;
+export default SchoolList;
