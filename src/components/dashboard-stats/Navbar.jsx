@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import Logout from '../auth/log-out';
 import { appLogout } from '@/utils/logout';
-
+import logo from '../../assets/logos/fts_logo2.png'
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
@@ -46,8 +46,10 @@ const Navbar = () => {
           
           {/* Logo */}
           <div className="flex items-center gap-8">
-            <div className="flex items-center px-6 py-2 bg-white rounded-full border border-gray-300">
-              <span className="font-medium text-gray-900">FTS Champ</span>
+            <div className="flex items-center   ">
+             
+              <img src ={logo} alt='company logo' className='w-auto h-12' />
+           
             </div>
           </div>
 

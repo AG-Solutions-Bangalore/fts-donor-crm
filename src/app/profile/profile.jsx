@@ -20,6 +20,8 @@ import {
   Camera,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ChangePasswordForm } from "@/components/auth/change-password-form";
+import BASE_URL from "@/config/base-url";
 
 const Profile = () => {
   const token = Cookies.get("token");
@@ -34,7 +36,7 @@ const Profile = () => {
     queryKey: ["donorProfile"],
     queryFn: async () => {
       const response = await fetch(
-        "https://agstest.in/api2/public/api/fetch-donor-profile",
+        `${BASE_URL}/api/fetch-donor-profile`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -45,7 +47,24 @@ const Profile = () => {
       return response.json();
     },
   });
+// Add this with your other queries
+const { data: statesData } = useQuery({
+  queryKey: ["states"],
+  queryFn: async () => {
+    const response = await fetch(
+      `${BASE_URL}/api/panel-fetch-states`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.ok) throw new Error("Failed to fetch states");
+    return response.json();
+  },
+});
 
+const states = statesData?.data || [];
   // Update profile mutation
   const updateMutation = useMutation({
     mutationFn: async (updatedData) => {
@@ -68,7 +87,7 @@ const Profile = () => {
       }
 
       const response = await fetch(
-        "https://agstest.in/api2/public/api/update-donor-profile",
+     `${BASE_URL}/api/update-donor-profile`,
         {
           method: "POST",
           headers: {
@@ -187,6 +206,9 @@ const Profile = () => {
             </div>
 
             <div className="flex items-center gap-2">
+        <div className="bg-white ">
+        <ChangePasswordForm />
+        </div>
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
@@ -346,6 +368,8 @@ const Profile = () => {
                     </div>
                   </div>
                 </div>
+
+               
               </div>
 
               {/* Right Columns - Form Fields */}
@@ -544,12 +568,13 @@ const Profile = () => {
                         </div>
                       )}
                     </div>
+<hr className="col-span-3"/>
 
-                    {/* Residential Address */}
-                    <div className="md:col-span-2 space-y-1">
+
+<div className="md:col-span-2 space-y-1">
                       <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
                         <Home className="w-3 h-3" />
-                        Residential Address
+                        House & Street Number
                       </label>
                       {isEditing ? (
                         <textarea
@@ -631,24 +656,30 @@ const Profile = () => {
 
                     {/* State */}
                     <div className="space-y-1">
-                      <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        State
-                      </label>
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="indicomp_res_reg_state"
-                          value={formData.indicomp_res_reg_state || ""}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
-                        />
-                      ) : (
-                        <div className="px-3 py-2 bg-gray-50 rounded-md text-sm text-gray-900">
-                          {profile.indicomp_res_reg_state || "—"}
-                        </div>
-                      )}
-                    </div>
+  <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
+    <MapPin className="w-3 h-3" />
+    State
+  </label>
+  {isEditing ? (
+    <select
+      name="indicomp_res_reg_state"
+      value={formData.indicomp_res_reg_state || ""}
+      onChange={handleInputChange}
+      className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
+    >
+      <option value="">Select State</option>
+      {states.map((state) => (
+        <option key={state.id} value={state.state_name}>
+          {state.state_name}
+        </option>
+      ))}
+    </select>
+  ) : (
+    <div className="px-3 py-2 bg-gray-50 rounded-md text-sm text-gray-900">
+      {profile.indicomp_res_reg_state || "—"}
+    </div>
+  )}
+</div>
 
                     {/* PIN Code */}
                     <div className="space-y-1">
@@ -671,11 +702,15 @@ const Profile = () => {
                       )}
                     </div>
 
-                    {/* Office Address */}
+                    <hr className="col-span-3"/>
+
+
+
+                    {/* Residential Address */}
                     <div className="md:col-span-2 space-y-1">
                       <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
-                        <Building className="w-3 h-3" />
-                        Office Address
+                        <Home className="w-3 h-3" />
+                        Office & Street Number
                       </label>
                       {isEditing ? (
                         <textarea
@@ -692,68 +727,153 @@ const Profile = () => {
                       )}
                     </div>
 
-                    {/* Source */}
+                    {/* Area */}
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        Source
+                        <MapPin className="w-3 h-3" />
+                        Area
                       </label>
                       {isEditing ? (
                         <input
                           type="text"
-                          name="indicomp_source"
-                          value={formData.indicomp_source || ""}
+                          name="indicomp_off_branch_area"
+                          value={formData.indicomp_off_branch_area || ""}
                           onChange={handleInputChange}
                           className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
                         />
                       ) : (
                         <div className="px-3 py-2 bg-gray-50 rounded-md text-sm text-gray-900">
-                          {profile.indicomp_source || "—"}
+                          {profile.indicomp_off_branch_area || "—"}
                         </div>
                       )}
                     </div>
 
-                    {/* Donor Type */}
+                    {/* Landmark */}
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        Donor Type
+                        <MapPin className="w-3 h-3" />
+                        Landmark
                       </label>
                       {isEditing ? (
                         <input
                           type="text"
-                          name="indicomp_donor_type"
-                          value={formData.indicomp_donor_type || ""}
+                          name="indicomp_off_branch_ladmark"
+                          value={formData.indicomp_off_branch_ladmark || ""}
                           onChange={handleInputChange}
                           className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
                         />
                       ) : (
                         <div className="px-3 py-2 bg-gray-50 rounded-md text-sm text-gray-900">
-                          {profile.indicomp_donor_type || "—"}
+                          {profile.indicomp_off_branch_ladmark || "—"}
                         </div>
                       )}
                     </div>
 
-                    {/* Remarks */}
-                    <div className="md:col-span-2 space-y-1">
+                    {/* City */}
+                    <div className="space-y-1">
                       <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
-                        <Briefcase className="w-3 h-3" />
-                        Remarks
+                        <MapPin className="w-3 h-3" />
+                        City
                       </label>
                       {isEditing ? (
-                        <textarea
-                          name="indicomp_remarks"
-                          value={formData.indicomp_remarks || ""}
+                        <input
+                          type="text"
+                          name="indicomp_off_branch_city"
+                          value={formData.indicomp_off_branch_city || ""}
                           onChange={handleInputChange}
-                          rows="2"
                           className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
                         />
                       ) : (
                         <div className="px-3 py-2 bg-gray-50 rounded-md text-sm text-gray-900">
-                          {profile.indicomp_remarks || "—"}
+                          {profile.indicomp_off_branch_city || "—"}
                         </div>
                       )}
                     </div>
+
+                    {/* State */}
+                    <div className="space-y-1">
+  <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
+    <MapPin className="w-3 h-3" />
+    State
+  </label>
+  {isEditing ? (
+    <select
+      name="indicomp_off_branch_state"
+      value={formData.indicomp_off_branch_state || ""}
+      onChange={handleInputChange}
+      className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
+    >
+      <option value="">Select State</option>
+      {states.map((state) => (
+        <option key={state.id} value={state.state_name}>
+          {state.state_name}
+        </option>
+      ))}
+    </select>
+  ) : (
+    <div className="px-3 py-2 bg-gray-50 rounded-md text-sm text-gray-900">
+      {profile.indicomp_off_branch_state || "—"}
+    </div>
+  )}
+</div>
+
+                    {/* PIN Code */}
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        PIN Code
+                      </label>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          name="indicomp_off_branch_pin_code"
+                          value={formData.indicomp_off_branch_pin_code || ""}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
+                        />
+                      ) : (
+                        <div className="px-3 py-2 bg-gray-50 rounded-md text-sm text-gray-900">
+                          {profile.indicomp_off_branch_pin_code || "—"}
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+  <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
+    <Home className="w-3 h-3" />
+    Correspondence Preference
+  </label>
+
+  {isEditing ? (
+    <select
+      name="indicomp_corr_preffer"
+      value={formData.indicomp_corr_preffer || "Residence"}
+      onChange={handleInputChange}
+      className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
+    >
+      {profile.indicomp_type === "Private" ? (
+        <>
+          <option value="Registered">Registered</option>
+          <option value="Branch Office">Branch Office</option>
+          <option value="Digital">Digital</option>
+        </>
+      ) : (
+        <>
+          <option value="Residence">Residence</option>
+          <option value="Office">Office</option>
+          <option value="Digital">Digital</option>
+        </>
+      )}
+    </select>
+  ) : (
+    <div className="px-3 py-2 bg-gray-50 rounded-md text-sm text-gray-900">
+      {profile.indicomp_corr_preffer || "Residence"}
+    </div>
+  )}
+</div>
+
+
+
+                 
                   </div>
                 </div>
               </div>

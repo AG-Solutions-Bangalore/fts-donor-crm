@@ -60,14 +60,7 @@ function AppRoutes() {
             </Suspense>
           }
         />
-        <Route
-          path="/receipt-view"
-          element={
-            <Suspense fallback={<LoadingBar />}>
-              <ReceiptView />
-            </Suspense>
-          }
-        />
+     
         <Route
           path="/school"
           element={

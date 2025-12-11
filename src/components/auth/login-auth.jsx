@@ -93,6 +93,7 @@ const loadingMessages = [
         Cookies.set("id", UserInfo.user.id, cookieOptions);
         Cookies.set("name", UserInfo.user.indicomp_full_name, cookieOptions);
         Cookies.set("chapter_id", UserInfo.user.chapter_id, cookieOptions);
+        Cookies.set("user_name", UserInfo.user.indicomp_fts_id, cookieOptions);
         Cookies.set("email", UserInfo.user.indicomp_email, cookieOptions);
         Cookies.set("token-expire-time", UserInfo?.token_expires_at, cookieOptions);
         Cookies.set("ver_con", version?.version_panel, cookieOptions);
@@ -128,7 +129,10 @@ const loadingMessages = [
                 <Lock className="w-6 h-6 text-yellow-400" />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">FTS Champ</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+             
+              
+              FTS Champ</h1>
             <p className="text-gray-600 text-sm">Donor Management System</p>
           </div>
 

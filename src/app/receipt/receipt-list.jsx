@@ -9,6 +9,8 @@ import {
   X
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { ReceiptViewDialog } from './ReceiptViewDialog';
+import BASE_URL from '@/config/base-url';
 
 const ReceiptList = () => {
   const token = Cookies.get("token");
@@ -70,7 +72,7 @@ const ReceiptList = () => {
    const financialYear = '2025-26';
      params.append('receipt_financial_year', financialYear);
       const response = await fetch(
-        `https://agstest.in/api2/public/api/fetch-donor-receipts-list?${params}`,
+       `${BASE_URL}/api/fetch-donor-receipts-list?${params}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -126,10 +128,7 @@ const ReceiptList = () => {
       setCurrentPage(page);
     }
   };
-  const handleViewReceipt = (receiptRefNo) => {
 
-    navigate(`/receipt-view?ref=${encodeURIComponent(receiptRefNo)}`);
-  };
 
   // Get visible columns
   const visibleColumns = columns.filter(col => !hiddenColumns[col.key]);
@@ -265,12 +264,12 @@ const ReceiptList = () => {
             {/* Table Header */}
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-200">
                   <tr>
                     {visibleColumns.map((column) => (
                       <th
                         key={column.key}
-                        className={`px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors ${column.width}`}
+                        className={`px-6 py-4 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors ${column.width}`}
                         onClick={() => handleSort(column.key)}
                       >
                         <div className="flex items-center gap-2">
@@ -287,7 +286,7 @@ const ReceiptList = () => {
                         </div>
                       </th>
                     ))}
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -352,9 +351,8 @@ const ReceiptList = () => {
                       
                             
                        
-                            <button      onClick={() => handleViewReceipt(receipt.receipt_ref_no)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View">
-                              <Eye className="w-4 h-4 text-gray-600" />
-                            </button>
+                           
+                            <ReceiptViewDialog id={receipt.receipt_ref_no}/>
                           
                           </div>
                         </td>

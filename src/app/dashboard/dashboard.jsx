@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Users, TrendingUp, Briefcase, ArrowUpRight, Phone, Mail, MapPin, Calendar, CreditCard, Building2, UserCircle, Heart, Receipt, CheckCircle, BarChart3, Clock } from 'lucide-react';
 import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom';
+import BASE_URL from '@/config/base-url';
 
 
 
@@ -13,7 +14,7 @@ const DonorDashboard = () => {
     queryKey: ['donorData'],
     
     queryFn: async () => {
-      const response = await fetch('https://agstest.in/api2/public/api/fetch-donors-view',
+      const response = await fetch(`${BASE_URL}/api/fetch-donors-view`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
