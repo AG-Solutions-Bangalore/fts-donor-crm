@@ -274,7 +274,7 @@ const ReceiptView = () => {
                       ) : (
                         <Download className="w-4 h-4" />
                       )}
-                      Download PDF
+                      Download 
                     </Button>
                
 
@@ -289,7 +289,7 @@ const ReceiptView = () => {
                       ) : (
                         <Printer className="w-4 h-4" />
                       )}
-                      Print Receipt
+                      Print 
                     </Button>
                 </div>
               

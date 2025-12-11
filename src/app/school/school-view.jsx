@@ -10,6 +10,7 @@ import {
   ArrowLeft, Globe, Navigation, Home, Map
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import BASE_URL from '@/config/base-url';
 
 const SchoolView = () => {
   const { id } = useParams();
@@ -70,7 +71,7 @@ const SchoolView = () => {
       });
 
       const response = await fetch(
-        `https://agstest.in/api2/public/api/fetch-school-alloted-view-by-id/${id}?${params}`,
+       `${BASE_URL}/api/fetch-school-alloted-view-by-id/${id}?${params}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -258,12 +259,12 @@ const SchoolView = () => {
             {/* Table Header */}
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-200">
                   <tr>
                     {visibleColumns.map((column) => (
                       <th
                         key={column.key}
-                        className={`px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors`}
+                        className={`px-6 py-4 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors`}
                         onClick={() => handleSort(column.key)}
                       >
                         <div className="flex items-center gap-2">

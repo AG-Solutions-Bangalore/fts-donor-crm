@@ -15,7 +15,7 @@ const ProtectedRoute = () => {
   return user ? (
     <div className="min-h-screen bg-gradient-to-br from-gray-200 via-gray-100 to-amber-50 ">
     <Navbar />
-    <div className="pt-24 ">
+    <div className="pt-24 max-w-[1600px] mx-auto">
     <Outlet />
     </div>
     
