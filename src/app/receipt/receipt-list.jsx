@@ -21,7 +21,7 @@ const ReceiptList = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const dropdownRef = useRef(null);
   const navigate = useNavigate()
-  // Available columns with their display names
+  
   const columns = [
     { key: 'receipt_no', label: 'Receipt No', visible: true,  },
 
@@ -33,7 +33,7 @@ const ReceiptList = () => {
    
   ];
 
-  // Close dropdown when clicking outside
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -64,9 +64,11 @@ const ReceiptList = () => {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         per_page: perPage.toString(),
-        search: debouncedSearch
+        search: debouncedSearch,
+        
       });
-
+   const financialYear = '2025-26';
+     params.append('receipt_financial_year', financialYear);
       const response = await fetch(
         `https://agstest.in/api2/public/api/fetch-donor-receipts-list?${params}`,
         {
@@ -167,6 +169,7 @@ const ReceiptList = () => {
 
   const receipts = data?.data?.data || [];
   const pagination = data?.data || {};
+  const sumAmount = data?.sumAmount || [];
 
   return (
     <div>
@@ -256,9 +259,9 @@ const ReceiptList = () => {
               </div>
             </div>
           </div>
-
+<div className='w-full flex  flex-col lg:flex-row   gap-5 '>
           {/* Table Container */}
-          <div className="bg-white rounded-3xl shadow-sm overflow-hidden scrollbar-custom">
+          <div className="bg-white w-full lg:w-[70%] rounded-3xl shadow-sm overflow-hidden scrollbar-custom">
             {/* Table Header */}
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -460,7 +463,106 @@ const ReceiptList = () => {
               </div>
             )}
           </div>
+
+
+        <div className='w-full lg:w-[30%]'>
+  <div className="bg-white rounded-3xl p-2   shadow-sm">
+   
+    
+    {sumAmount && sumAmount.length > 0 ? (
+      <div className="space-y-6">
+        {/* Main Summary Card */}
+        <div className="p-4 bg-gradient-to-br from-yellow-900 to-yellow-700 rounded-xl text-white">
+          <div className='flex border-b border-white/20 pb-3 mb-3 flex-row items-center justify-between'>
+            <h3 className="text-lg font-semibold text-white">All Donations</h3>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-yellow-300" />
+              <span className="text-xs font-medium">Summary</span>
+            </div>
+          </div>
+          
+          {/* Group by receipt_donation_type */}
+          <div className="space-y-4">
+            {(() => {
+              // Group by receipt_donation_type
+              const groupedData = {};
+              sumAmount.forEach(item => {
+                if (!groupedData[item.receipt_donation_type]) {
+                  groupedData[item.receipt_donation_type] = [];
+                }
+                groupedData[item.receipt_donation_type].push(item);
+              });
+              
+              return Object.entries(groupedData).map(([donationType, items], index) => {
+                const totalForType = items.reduce((sum, item) => sum + parseInt(item.total_amount || 0), 0);
+                
+                return (
+                  <div key={index} className="space-y-2">
+                    {/* Donation Type Header */}
+                    <div className="flex items-center justify-between">
+                      <div className="font-semibold text-sm">{donationType}</div>
+                      <div className="text-sm font-bold">
+                        ₹{totalForType.toLocaleString('en-IN')}
+                      </div>
+                    </div>
+                    
+                    {/* 80G and Non-80G breakdown */}
+                    <div className="space-y-1 pl-4">
+                      {items.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between text-xs opacity-80">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-1.5 h-1.5 rounded-full ${
+                              item.receipt_exemption_type === '80G' 
+                                ? 'bg-green-400'
+                                : 'bg-gray-300'
+                            }`}></div>
+                            <span>{item.receipt_exemption_type}</span>
+                          </div>
+                          <span>₹{parseInt(item.total_amount).toLocaleString('en-IN')}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {index < Object.keys(groupedData).length - 1 && (
+                      <div className="border-t border-white/10 pt-2"></div>
+                    )}
+                  </div>
+                );
+              });
+            })()}
+          </div>
+          
+          {/* Total Amount */}
+          <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/20">
+            <span className="text-sm font-semibold">Total Amount</span>
+            <span className="font-bold text-xl">
+              ₹{sumAmount.reduce((sum, item) => sum + parseInt(item.total_amount || 0), 0).toLocaleString('en-IN')}
+            </span>
+          </div>
+          
+          {/* Categories Count */}
+          <div className="flex items-center justify-between mt-3 text-xs opacity-80">
+            <span>Categories</span>
+            <span>{sumAmount.length}</span>
+          </div>
         </div>
+        
+      
+      </div>
+    ) : (
+      <div className="text-center py-8 text-gray-500">
+        <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
+        <p className="text-sm">No donation summary available</p>
+      </div>
+    )}
+  </div>
+</div>
+</div>
+</div>
+
+
+
+
       </div>
     </div>
   );

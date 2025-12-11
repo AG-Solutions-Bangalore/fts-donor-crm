@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import React, {  useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import numWords from "num-words";
 import moment from "moment";
 import { useReactToPrint } from "react-to-print";
@@ -7,37 +7,26 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useQuery } from "@tanstack/react-query";
 
-// Shadcn components
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {  TooltipProvider } from "@/components/ui/tooltip";
 
-// Lucide React icons
 import { 
-  FileType, 
+   
   Printer, 
   FileText, 
   Loader2,
   Download,
-  Share2,
-  Copy,
-  CheckCircle,
   Calendar,
   Receipt as ReceiptIcon,
-  User,
   Building,
-  CreditCard,
-  Mail,
-  Phone,
-  MapPin,
   ArrowLeft,
-  ExternalLink,
   Shield,
   FileCheck
 } from "lucide-react";
 
-// Assets
+
 import Logo1 from "../../assets/receipt/fts_log.png";
 import Logo2 from "../../assets/receipt/top.png";
 import Logo3 from "../../assets/receipt/ekal.png";
@@ -247,6 +236,7 @@ const ReceiptView = () => {
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
+
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                   Receipt #{receipts.receipt_ref_no}
@@ -272,23 +262,35 @@ const ReceiptView = () => {
                 </Badge>
               )}
                <div className="flex items-center gap-4">
-                  <Button
-                    variant={activeTab === "receipt" ? "default" : "ghost"}
-                    onClick={() => setActiveTab("receipt")}
-                    className={`gap-2 rounded-full    ${activeTab  === "receipt" ? "bg-yellow-900 text-white hover:bg-blue-500" : "bg-blue-500 hover:bg-yellow-500 text-white"}`}
-                  >
-                    <ReceiptIcon className="w-4 h-4" />
-                    Receipt
-                  </Button>
-                  <Button
-                    variant={activeTab === "letter" ? "default" : "ghost"}
-                    onClick={() => setActiveTab("letter")}
+                 
+                     <Button 
+                      variant="outline" 
+                     className={`gap-2 rounded-full    ${activeTab  === "receipt" ? "bg-yellow-900 text-white hover:bg-blue-500" : "bg-blue-500 hover:bg-yellow-500 text-white"}`}
+                      onClick={handleSavePDF}
+                      disabled={isSavingPDF}
+                    >
+                      {isSavingPDF ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Download className="w-4 h-4" />
+                      )}
+                      Download PDF
+                    </Button>
+               
+
+                    <Button 
+                      variant="outline" 
                     className={`gap-2 rounded-full    ${activeTab  === "letter" ? "bg-yellow-900 text-white hover:bg-blue-500" : "bg-blue-500 hover:bg-yellow-500 text-white"}`}
-                  >
-                    <FileText className="w-4 h-4" />
-                    Letter
-                  </Button>
-                  
+                      onClick={handlReceiptPdf}
+                      disabled={isPrintingReceipt}
+                    >
+                      {isPrintingReceipt ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Printer className="w-4 h-4" />
+                      )}
+                      Print Receipt
+                    </Button>
                 </div>
               
             </div>
@@ -300,8 +302,8 @@ const ReceiptView = () => {
           
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Receipt Preview - Left Column */}
+          <div className="grid grid-cols-1 gap-6">
+          
             {activeTab === "receipt" && (
               <div className="lg:col-span-2">
                 <Card className="border border-gray-200/50 bg-gradient-to-br from-yellow-200/80 to-yellow-100/80 rounded-2xl shadow-sm overflow-hidden">
@@ -532,197 +534,12 @@ const ReceiptView = () => {
               </div>
             )}
 
-            {/* Letter Preview */}
-            {activeTab === "letter" && (
-              <div className="lg:col-span-2">
-                <Card className="border border-gray-200/50 bg-gradient-to-br from-blue-200/80 to-blue-100/80 rounded-2xl shadow-sm overflow-hidden">
-                  <CardContent className="p-6">
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-bold text-gray-900">Acknowledgement Letter</h2>
-                        <Badge className="bg-blue-50 text-blue-700 border-blue-200">
-                          Official Correspondence
-                        </Badge>
-                      </div>
-                      <p className="text-gray-600 text-sm">
-                        Official thank you letter for your generous donation
-                      </p>
-                    </div>
-
-                    <div className="border border-gray-300 rounded-xl p-6 bg-white shadow-inner">
-                      <div className="space-y-6">
-                        <div className="flex justify-between items-start border-b pb-4">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <Building className="w-5 h-5 text-gray-400" />
-                              <span className="font-semibold text-gray-900">{chapter.chapter_name}</span>
-                            </div>
-                            <p className="text-sm text-gray-600">
-                              {chapter?.chapter_address}, {chapter?.chapter_city} - {chapter?.chapter_pin}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm text-gray-600">
-                              Date: {moment(receipts.receipt_date).format("DD-MM-YYYY")}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">Ref: {receipts.receipt_ref_no}</p>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <p className="font-semibold text-gray-900">
-                            {receipts.donor.indicomp_type !== "Individual" && "M/s "}
-                            {receipts.donor.title} {receipts.donor.indicomp_full_name}
-                          </p>
-                          {receipts.donor.indicomp_res_reg_address && (
-                            <p className="text-sm text-gray-600">
-                              {receipts.donor.indicomp_res_reg_address}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="space-y-4">
-                          <p className="text-gray-700">
-                            {receipts.donor?.indicomp_gender === "Female" && "Respected Madam,"}
-                            {receipts.donor?.indicomp_gender === "Male" && "Respected Sir,"}
-                            {receipts.donor?.indicomp_gender === null && "Respected Sir,"}
-                          </p>
-
-                          {receipts.receipt_donation_type === "One Teacher School" && (
-                            <div className="space-y-3">
-                              <p className="text-center font-semibold text-gray-900">
-                                Sub: Adoption of One Teacher School
-                              </p>
-                              <p className="text-gray-700 leading-relaxed">
-                                We acknowledge with thanks the receipt of Rs. {receipts.receipt_total_amount}/- 
-                                Rupees {amountInWords} Only via {receipts.receipt_tran_pay_mode === "Cash" ? 
-                                "Cash" : receipts.receipt_tran_pay_details} for your contribution and adoption 
-                                of {receipts.receipt_no_of_ots} OTS.
-                              </p>
-                            </div>
-                          )}
-
-                          {receipts.receipt_donation_type === "General" && (
-                            <p className="text-gray-700 leading-relaxed">
-                              We thankfully acknowledge the receipt of Rs. {receipts.receipt_total_amount}/- 
-                              via your {receipts.receipt_tran_pay_mode === "Cash" ? "Cash" : receipts.receipt_tran_pay_details} 
-                              being Donation for Education.
-                            </p>
-                          )}
-
-                          {receipts.receipt_donation_type === "Membership" && (
-                            <p className="text-gray-700 leading-relaxed">
-                              We acknowledge with thanks receipt of your membership subscription upto {receipts?.m_ship_vailidity}.
-                            </p>
-                          )}
-
-                          <div className="pt-4 border-t">
-                            <p className="text-gray-700 mb-2">Thanking you once again</p>
-                            <p className="text-gray-700 mb-2">Yours faithfully,</p>
-                            <p className="font-semibold text-gray-900">For Friends of Tribals Society</p>
-                            <div className="mt-6 space-y-1">
-                              {authsign.map((sig, key) => (
-                                <div key={key} className="flex items-center gap-2">
-                                  {sig.signature_image && (
-                                    <img
-                                      src={sig.signature_image}
-                                      alt="Signature"
-                                      className="h-8"
-                                    />
-                                  )}
-                                  <span className="font-medium">{sig.indicomp_full_name}</span>
-                                </div>
-                              ))}
-                              <p className="text-sm text-gray-600">{chapter.auth_sign || "Authorized Signatory"}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+         
 
             
 
-            {/* Sidebar - Summary & Actions */}
-            <div className="space-y-6">
-              {/* Amount Card */}
-              <Card className="border border-emerald-200/50 rounded-2xl shadow-lg bg-gradient-to-br from-emerald-50 to-emerald-100/50">
-  <CardContent className="p-6">
-    <div className="text-center">
-      <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-full mb-4 shadow-sm">
-        <ReceiptIcon className="w-6 h-6 text-emerald-700" />
-      </div>
-      <div className="mb-2">
-        <div className="text-sm text-emerald-600 font-medium">Total Amount</div>
-        <div className="text-3xl font-bold text-emerald-800">
-          ₹{receipts.receipt_total_amount}
-        </div>
-      </div>
-      <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-sm">
-        {receipts.receipt_donation_type}
-      </Badge>
-      <p className="text-xs text-emerald-600/80 mt-2 capitalize">{amountInWords} only</p>
-    </div>
-  </CardContent>
-</Card>
-
-              {/* Status Card */}
-              
-
-             
-
-              {/* Quick Actions */}
-              <Card className="border border-gray-200/50 rounded-2xl shadow-sm">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                  <div className="space-y-2">
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start gap-2"
-                      onClick={handleSavePDF}
-                      disabled={isSavingPDF}
-                    >
-                      {isSavingPDF ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Download className="w-4 h-4" />
-                      )}
-                      Download PDF
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start gap-2"
-                      onClick={handlReceiptPdf}
-                      disabled={isPrintingReceipt}
-                    >
-                      {isPrintingReceipt ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Printer className="w-4 h-4" />
-                      )}
-                      Print Receipt
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start gap-2"
-                      onClick={handlPrintPdf}
-                      disabled={isPrintingLetter}
-                    >
-                      {isPrintingLetter ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <FileText className="w-4 h-4" />
-                      )}
-                      Print Letter
-                    </Button>
-                   
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          
+           
           </div>
 
           {/* Footer */}
@@ -744,168 +561,7 @@ const ReceiptView = () => {
           </div>
         </div>
 
-        {/* Hidden Print Content */}
-        <div className="hidden">
-           <div ref={containerRef}>
-                        <div className="flex justify-between p-6 mt-44">
-                          <div className="text-[#464D69] md:text-xl text-sm">
-                            <p className="font-serif text-[20px]">
-                              Date: {moment(receipts.receipt_date).format("DD-MM-YYYY")}
-                            </p>
-          
-                            {Object.keys(receipts).length !== 0 && (
-                              <div className="mt-2">
-                                {receipts.receipt_donation_type !== "Membership" &&
-                                  receipts.donor.indicomp_type !== "Individual" && (
-                                    <p className="font-serif text-[18px]">
-                                      {receipts.donor.title}{" "}
-                                      {receipts.donor.indicomp_com_contact_name}
-                                    </p>
-                                  )}
-          
-                                {receipts.donor.indicomp_type !== "Individual" && (
-                                  <p className="font-serif text-[18px]">
-                                    M/s {receipts.donor.indicomp_full_name}
-                                  </p>
-                                )}
-          
-                                {receipts.donor.indicomp_type === "Individual" && (
-                                  <p className="font-serif text-[18px]">
-                                    {receipts.donor.title}{" "}
-                                    {receipts.donor.indicomp_full_name}
-                                  </p>
-                                )}
-          
-                                {receipts.donor.indicomp_off_branch_address && (
-                                  <div>
-                                    <p className="font-serif text-[18px]">
-                                      {receipts.donor.indicomp_off_branch_address}
-                                    </p>
-                                    <p className="font-serif text-[18px]">
-                                      {receipts.donor.indicomp_off_branch_area}
-                                    </p>
-                                    <p className="mb-0 text-xl">
-                                      {receipts.donor.indicomp_off_branch_ladmark}
-                                    </p>
-                                    <p className="font-serif text-[18px]">
-                                      {receipts.donor.indicomp_off_branch_city} -{" "}
-                                      {receipts.donor.indicomp_off_branch_pin_code},
-                                      {receipts.donor.indicomp_off_branch_state}
-                                    </p>
-                                  </div>
-                                )}
-          
-                                {receipts.donor.indicomp_res_reg_address && (
-                                  <div>
-                                    <p className="font-serif text-[18px]">
-                                      {receipts.donor.indicomp_res_reg_address}
-                                    </p>
-                                    <p className="font-serif text-[18px]">
-                                      {receipts.donor.indicomp_res_reg_area}
-                                    </p>
-                                    <p className="font-serif text-[18px]">
-                                      {receipts.donor.indicomp_res_reg_ladmark}
-                                    </p>
-                                    <p className="font-serif text-[18px]">
-                                      {receipts.donor.indicomp_res_reg_city} -{" "}
-                                      {receipts.donor.indicomp_res_reg_pin_code},
-                                      {receipts.donor.indicomp_res_reg_state}
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-          
-                            <p className="my-6 font-serif text-[18px] text-justify">
-                              {receipts.donor?.indicomp_gender === "Female" && "Respected Madam,"}
-                              {receipts.donor?.indicomp_gender === "Male" && "Respected Sir,"}
-                              {receipts.donor?.indicomp_gender === null && "Respected Sir,"}
-                            </p>
-          
-                            {receipts.receipt_donation_type === "One Teacher School" && (
-                              <div className="mt-2 text-justify">
-                                <p className="font-serif text-[18px] flex justify-center my-6">
-                                  Sub: Adoption of One Teacher School
-                                </p>
-                                <p className="font-serif text-[18px] text-justify leading-[1.2rem]">
-                                  We acknowledge with thanks the receipt of Rs.
-                                  {receipts.receipt_total_amount}/- Rupees {amountInWords} Only via{" "}
-                                  {receipts.receipt_tran_pay_mode == "Cash" ? (
-                                    <>Cash for your contribution and adoption of {receipts.receipt_no_of_ots} OTS.</>
-                                  ) : (
-                                    <>{receipts.receipt_tran_pay_details} being for your contribution and adoption of {receipts.receipt_no_of_ots} OTS.</>
-                                  )}
-                                </p>
-          
-                                <p className="my-4 font-serif text-[18px] text-justify leading-[1.2rem]">
-                                  We convey our sincere thanks and gratitude for your kind support towards the need of our tribals and also the efforts being made by our Society for achieving comprehensive development of our tribals brethren particularly the literacy of their children and health & economic welfare.
-                                </p>
-                                <p className="font-serif text-[18px] text-justify leading-[1.2rem]">
-                                  We would like to state that our efforts are not only for mitigating the hardship and problems of our tribals but we are also trying to inculcate national character among them.
-                                </p>
-                                <p className="my-4 font-serif text-[18px] text-justify leading-[1.2rem]">
-                                  We are pleased to enclose herewith our money receipt no. {receipts.receipt_ref_no} dated{" "}
-                                  {moment(receipts.receipt_date).format("DD-MM-YYYY")} for the said amount together with a certificate U/sec. 80(G) of the I.T.Act. 1961.
-                                </p>
-                              </div>
-                            )}
-          
-                            {receipts.receipt_donation_type === "General" && (
-                              <div className="mt-2">
-                                <p className="font-serif text-[18px] text-justify my-5 leading-[1.2rem]">
-                                  We thankfully acknowledge the receipt of Rs.
-                                  {receipts.receipt_total_amount}/- via your{" "}
-                                  {receipts.receipt_tran_pay_mode === "Cash" ? "Cash" : receipts.receipt_tran_pay_details}{" "}
-                                  being Donation for Education.
-                                </p>
-          
-                                <p className="font-serif text-[18px] text-justify leading-[1.2rem]">
-                                  We are pleased to enclose herewith our money receipt no. {receipts.receipt_ref_no} dated{" "}
-                                  {moment(receipts.receipt_date).format("DD-MM-YYYY")} for the said amount.
-                                </p>
-                              </div>
-                            )}
-          
-                            {receipts.receipt_donation_type === "Membership" && (
-                              <div>
-                                <p className="font-serif text-[18px] text-justify my-5 leading-[1.2rem]">
-                                  We acknowledge with thanks receipt of your membership subscription upto {receipts?.m_ship_vailidity}. Our receipt for the same is enclosed herewith.
-                                </p>
-                              </div>
-                            )}
-          
-                            {receipts.receipt_donation_type !== "Membership" && (
-                              <div>
-                                <p className="my-3 font-serif text-[18px]">Thanking you once again</p>
-                                <p className="font-serif text-[18px]">Yours faithfully, </p>
-                                <p className="my-3 font-serif text-[18px]">For Friends of Tribals Society</p>
-                                <p className="font-serif text-[18px] mt-10">
-                                  {authsign.map((sig, key) => (
-                                    <span key={key}>{sig.indicomp_full_name}</span>
-                                  ))}
-                                </p>
-                                <p className="font-serif text-[18px]">{chapter.auth_sign} </p>
-                                <p className="my-2 font-serif text-[18px]">Encl: As stated above</p>
-                              </div>
-                            )}
-          
-                            {receipts.receipt_donation_type === "Membership" && (
-                              <div>
-                                <p className="font-serif text-[18px] text-justify my-5">With Best regards </p>
-                                <p className="font-serif text-[18px] text-justify my-5">Yours sincerely </p>
-                                <p className="font-serif text-[18px] text-justify my-5">
-                                  {authsign.map((sig, key) => (
-                                    <span key={key}>{sig.indicomp_full_name}</span>
-                                  ))}
-                                </p>
-                                <p className="font-serif text-[18px] text-justify my-5">{chapter.auth_sign} </p>
-                                <p className="font-serif text-[18px] text-justify my-5">Encl: As stated above</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-        </div>
+      
       </div>
       </div>
     </TooltipProvider>
