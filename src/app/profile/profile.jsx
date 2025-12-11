@@ -232,17 +232,17 @@ const states = statesData?.data || [];
                     Cancel
                   </button>
                   <button
-                    onClick={handleSubmit}
-                    disabled={updateMutation.isLoading}
-                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all shadow flex items-center gap-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {updateMutation.isLoading ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <Save className="w-3 h-3" />
-                    )}
-                    {updateMutation.isLoading ? "Saving..." : "Save"}
-                  </button>
+  onClick={handleSubmit}
+  disabled={updateMutation.isPending}
+  className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all shadow flex items-center gap-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  {updateMutation.isPending ? (
+    <Loader2 className="w-3 h-3 animate-spin" />
+  ) : (
+    <Save className="w-3 h-3" />
+  )}
+  {updateMutation.isPending ? "Saving..." : "Save"}
+</button>
                 </>
               )}
             </div>
@@ -326,6 +326,66 @@ const states = statesData?.data || [];
                     </div>
                   </div>
                 </div>
+{/* Family & Company Details Card */}
+<div className="bg-white rounded-xl p-4 shadow border border-gray-200">
+  <h3 className="text-base font-semibold text-gray-900 mb-3">
+    Related Details
+  </h3>
+
+  {/* Family Details */}
+  <div className="space-y-2 mb-4">
+    <h4 className="text-sm font-semibold text-gray-700">Family Members</h4>
+
+    {data?.family_details?.length > 0 ? (
+      data.family_details.map((member, index) => {
+        const isActive = member.indicomp_status === "Active";
+        return (
+          <div
+            key={index}
+            className={`flex items-center justify-between px-3 py-2 rounded-md ${
+              isActive ? "bg-green-50" : "bg-gray-50"
+            }`}
+          >
+            <span className="text-xs text-gray-600">Name</span>
+            <span className="text-xs font-medium text-gray-900">
+              {member.indicomp_full_name}
+            </span>
+          </div>
+        );
+      })
+    ) : (
+      <p className="text-xs text-gray-500">No family details found</p>
+    )}
+  </div>
+
+  <hr className="my-3" />
+
+  {/* Company Details */}
+  <div className="space-y-2">
+    <h4 className="text-sm font-semibold text-gray-700">Company Members</h4>
+
+    {data?.company_details?.length > 0 ? (
+      data.company_details.map((company, index) => {
+        const isActive = company.indicomp_status === "Active";
+        return (
+          <div
+            key={index}
+            className={`flex items-center justify-between px-3 py-2 rounded-md ${
+              isActive ? "bg-green-50" : "bg-gray-50"
+            }`}
+          >
+            <span className="text-xs text-gray-600">Name</span>
+            <span className="text-xs font-medium text-gray-900">
+              {company.indicomp_full_name}
+            </span>
+          </div>
+        );
+      })
+    ) : (
+      <p className="text-xs text-gray-500">No company details found</p>
+    )}
+  </div>
+</div>
 
                 {/* Account Status */}
                 <div className="bg-white rounded-xl p-4 shadow border border-gray-200">
@@ -574,7 +634,7 @@ const states = statesData?.data || [];
 <div className="md:col-span-2 space-y-1">
                       <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
                         <Home className="w-3 h-3" />
-                        House & Street Number
+                        Residential Address
                       </label>
                       {isEditing ? (
                         <textarea
@@ -710,7 +770,7 @@ const states = statesData?.data || [];
                     <div className="md:col-span-2 space-y-1">
                       <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
                         <Home className="w-3 h-3" />
-                        Office & Street Number
+                        Office Address
                       </label>
                       {isEditing ? (
                         <textarea

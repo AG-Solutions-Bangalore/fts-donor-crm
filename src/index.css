@@ -29,3 +29,16 @@
   .scrollbar-custom::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
   }
+
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%) rotate(45deg);
+    }
+    100% {
+      transform: translateX(100%) rotate(45deg);
+    }
+  }
+  
+  .animate-shine {
+    animation: shine 2s ease-in-out infinite;
+  }
